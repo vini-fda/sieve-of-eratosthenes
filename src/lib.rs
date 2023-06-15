@@ -27,7 +27,6 @@ pub fn sieve_original(n: u64) -> Vec<u64> {
 
 pub fn sieve_segmented(n: u64) -> Vec<u64> {
     let segment_len: u64 = (n as f64).sqrt() as u64;
-    dbg!(segment_len);
     let mut lo = 2;
     // fixed-length sieve
     let mut is_prime = vec![true; segment_len as usize];
