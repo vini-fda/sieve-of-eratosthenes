@@ -26,14 +26,15 @@ pub fn sieve_original(n: u64) -> Vec<u64> {
 }
 
 pub fn sieve_segmented(n: u64) -> Vec<u64> {
-    let delta: u64 = 10;
+    let delta: u64 = (n as f64).sqrt() as u64;
+    dbg!(delta);
     let mut lo = 2;
     let mut hi = lo + delta;
     let mut s = vec![true; delta as usize];
     let mut primes = sieve_original(hi);
-    lo += delta + 1;
-    hi += delta + 1;
-    while hi <= n {
+    lo += delta;
+    hi += delta;
+    while hi <= n + 1 {
         for p in &primes {
             let mut j = (lo / p) * p;
             if j < lo {
@@ -50,8 +51,8 @@ pub fn sieve_segmented(n: u64) -> Vec<u64> {
             }
         });
         s.iter_mut().for_each(|x| *x = true);
-        lo += delta + 1;
-        hi += delta + 1;
+        lo += delta;
+        hi += delta;
     }
     if lo <= n {
         let mut s = vec![true; (n - lo + 1) as usize];
@@ -72,4 +73,34 @@ pub fn sieve_segmented(n: u64) -> Vec<u64> {
         });
     }
     primes
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn primes_up_to_100() {
+        let n = 100;
+        let primes = super::sieve_segmented(n);
+        let expected = vec![
+            2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83,
+            89, 97,
+        ];
+        assert_eq!(primes, expected);
+    }
+    #[test]
+    fn num_primes_10_million() {
+        let n = 10_000_000;
+        let expected_num = 664_579;
+        let primes = super::sieve_segmented(n);
+        assert_eq!(primes.len(), expected_num);
+        let primes = super::sieve_original(n);
+        assert_eq!(primes.len(), expected_num);
+    }
+    #[test]
+    fn num_primes_1_billion() {
+        let n = 1_000_000_000;
+        let expected_num = 50_847_534;
+        let primes = super::sieve_segmented(n);
+        assert_eq!(primes.len(), expected_num);
+    }
 }
