@@ -26,51 +26,36 @@ pub fn sieve_original(n: u64) -> Vec<u64> {
 }
 
 pub fn sieve_segmented(n: u64) -> Vec<u64> {
-    let delta: u64 = (n as f64).sqrt() as u64;
-    dbg!(delta);
+    let segment_len: u64 = (n as f64).sqrt() as u64;
+    dbg!(segment_len);
     let mut lo = 2;
-    let mut hi = lo + delta;
-    let mut s = vec![true; delta as usize];
-    let mut primes = sieve_original(hi);
-    lo += delta;
-    hi += delta;
-    while hi <= n + 1 {
+    // fixed-length sieve
+    let mut is_prime = vec![true; segment_len as usize];
+    let mut primes = sieve_original(lo + segment_len - 1);
+    lo += segment_len;
+    while lo <= n {
+        let hi = std::cmp::min(lo + segment_len - 1, n);
         for p in &primes {
+            if p * p > hi {
+                break;
+            }
             let mut j = (lo / p) * p;
             if j < lo {
                 j += p;
             }
-            while j < hi {
-                s[(j - lo) as usize] = false;
+            while j <= hi {
+                is_prime[(j - lo) as usize] = false;
                 j += p;
             }
         }
-        s.iter().enumerate().for_each(|(i, &is_prime)| {
-            if is_prime {
-                primes.push(lo + i as u64);
+        is_prime.iter().enumerate().for_each(|(i, &is_prime)| {
+            let j = i as u64 + lo;
+            if is_prime && j <= hi {
+                primes.push(j);
             }
         });
-        s.iter_mut().for_each(|x| *x = true);
-        lo += delta;
-        hi += delta;
-    }
-    if lo <= n {
-        let mut s = vec![true; (n - lo + 1) as usize];
-        for p in &primes {
-            let mut j = (lo / p) * p;
-            if j < lo {
-                j += p;
-            }
-            while j <= n {
-                s[(j - lo) as usize] = false;
-                j += p;
-            }
-        }
-        s.iter().enumerate().for_each(|(i, &is_prime)| {
-            if is_prime {
-                primes.push(lo + i as u64);
-            }
-        });
+        is_prime.iter_mut().for_each(|x| *x = true);
+        lo += segment_len;
     }
     primes
 }
