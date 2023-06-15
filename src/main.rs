@@ -1,6 +1,10 @@
-use sieve_of_eratosthenes::sieve_original;
+use sieve_of_eratosthenes::sieves::segmented::sieve_segmented;
 
 fn main() {
-    let n = 10000;
-    println!("Primes up to {}: {:?}", n, sieve_original(n));
+    let n = 1_000_000_000;
+    println!(
+        "Number of primes up to {}: {:?}",
+        n,
+        sieve_segmented(n).len()
+    );
 }
